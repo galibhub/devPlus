@@ -90,8 +90,73 @@ const getSingleIssue = async (
 
   }
 };
+
+const updateIssue = async (
+  req: Request,
+  res: Response,
+) => {
+
+  try {
+
+    const result =
+      await issueService.updateIssueFromDB(
+        req.body,
+        req.params.id as string,
+        req.user,
+      );
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Issue updated successfully!",
+      data: result,
+    });
+
+  } catch (error: any) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
+
+const deleteIssue = async (
+  req: Request,
+  res: Response,
+) => {
+
+  try {
+
+    await issueService.deleteIssueFromDB(
+      req.params.id as string,
+      req.user,
+    );
+
+    res.status(200).json({
+      success: true,
+      message:
+        "Issue deleted successfully!",
+      data: {},
+    });
+
+  } catch (error: any) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
 export const issueController = {
   createIssue,
   getAllIssues,
-  getSingleIssue
+  getSingleIssue,
+
+  updateIssue,
+  deleteIssue
 };
