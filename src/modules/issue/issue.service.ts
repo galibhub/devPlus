@@ -37,6 +37,41 @@ const createIssueIntoDB = async (
   return result;
 };
 
+
+
+
+const getAllIssuesFromDB = async () => {
+
+  const result = await pool.query(`
+    SELECT * FROM issues
+    ORDER BY created_at DESC
+  `);
+
+  return result.rows;
+};
+
+
+
+
+//single issue
+
+const getSingleIssueFromDB = async (
+  id: string,
+) => {
+
+  const result = await pool.query(
+    `
+    SELECT * FROM issues
+    WHERE id=$1
+    `,
+    [id],
+  );
+
+  return result.rows[0];
+};
+
 export const issueService = {
   createIssueIntoDB,
+  getAllIssuesFromDB,
+  getSingleIssueFromDB
 };

@@ -36,6 +36,62 @@ const createIssue = async (
   }
 };
 
+
+const getAllIssues = async (
+  req: Request,
+  res: Response,
+) => {
+
+  try {
+
+    const result =
+      await issueService.getAllIssuesFromDB();
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+
+  } catch (error: any) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
+
+
+const getSingleIssue = async (
+  req: Request,
+  res: Response,
+) => {
+
+  try {
+
+    const result =
+      await issueService.getSingleIssueFromDB(
+        req.params.id as string,
+      );
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+
+  } catch (error: any) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
 export const issueController = {
   createIssue,
+  getAllIssues,
+  getSingleIssue
 };
