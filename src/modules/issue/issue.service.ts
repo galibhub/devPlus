@@ -346,11 +346,60 @@ const deleteIssueFromDB = async (
   return result;
 };
 
+
+//issue matrics
+const getIssueMetricsFromDB =
+  async () => {
+
+    const totalResult =
+      await pool.query(`
+        SELECT COUNT(*) FROM issues
+      `);
+
+    const openResult =
+      await pool.query(`
+        SELECT COUNT(*) FROM issues
+        WHERE status='open'
+      `);
+
+    const progressResult =
+      await pool.query(`
+        SELECT COUNT(*) FROM issues
+        WHERE status='in_progress'
+      `);
+
+    const resolvedResult =
+      await pool.query(`
+        SELECT COUNT(*) FROM issues
+        WHERE status='resolved'
+      `);
+
+    return {
+
+      total: Number(
+        totalResult.rows[0].count,
+      ),
+
+      open: Number(
+        openResult.rows[0].count,
+      ),
+
+      in_progress: Number(
+        progressResult.rows[0].count,
+      ),
+
+      resolved: Number(
+        resolvedResult.rows[0].count,
+      ),
+    };
+  };
+
 export const issueService = {
   createIssueIntoDB,
   getAllIssuesFromDB,
   getSingleIssueFromDB,
 
     updateIssueFromDB,
-    deleteIssueFromDB
+    deleteIssueFromDB,
+    getIssueMetricsFromDB
 };

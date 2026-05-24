@@ -12,18 +12,23 @@ router.post(
   issueController.createIssue,
 );
 
-
 router.get(
   "/",
   issueController.getAllIssues,
 );
 
+// metrics BEFORE :id
+
+router.get(
+  "/metrics",
+  authMiddleware,
+  issueController.getIssueMetrics,
+);
 
 router.get(
   "/:id",
   issueController.getSingleIssue,
 );
-
 
 router.patch(
   "/:id",

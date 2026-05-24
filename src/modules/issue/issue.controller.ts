@@ -154,11 +154,51 @@ const deleteIssue = async (
   }
 };
 
+
+
+const getIssueMetrics = async (
+  req: Request,
+  res: Response,
+) => {
+
+  try {
+
+    // maintainer only
+
+    if (
+      req.user.role !== "maintainer"
+    ) {
+
+      throw new Error(
+        "Only maintainer can access metrics!",
+      );
+
+    }
+
+    const result =
+      await issueService.getIssueMetricsFromDB();
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+
+  } catch (error: any) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
+
 export const issueController = {
   createIssue,
   getAllIssues,
   getSingleIssue,
 
   updateIssue,
-  deleteIssue
+  deleteIssue,
+  getIssueMetrics
 };
