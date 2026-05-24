@@ -39,17 +39,123 @@ const createIssueIntoDB = async (
 
 
 
+const getAllIssuesFromDB = async (
+  query: any,
+) => {
 
-const getAllIssuesFromDB = async () => {
+  const {
+    sort = "newest",
+    type,
+    status,
+  } = query;
 
-  const result = await pool.query(`
+  let sql = `
     SELECT * FROM issues
-    ORDER BY created_at DESC
-  `);
+  `;
 
-  return result.rows;
+  const conditions = [];
+
+  const values = [];
+
+  // filtering
+
+  if (type) {
+
+    values.push(type);
+
+    conditions.push(
+      `type=$${values.length}`
+    );
+
+  }
+
+  if (status) {
+
+    values.push(status);
+
+    conditions.push(
+      `status=$${values.length}`
+    );
+
+  }
+
+  // where
+
+  if (conditions.length > 0) {
+
+    sql += `
+      WHERE ${conditions.join(" AND ")}
+    `;
+
+  }
+
+  // sorting
+
+  if (sort === "oldest") {
+
+    sql += `
+      ORDER BY created_at ASC
+    `;
+
+  } else {
+
+    sql += `
+      ORDER BY created_at DESC
+    `;
+
+  }
+
+  // get issues
+
+  const issuesResult =
+    await pool.query(sql, values);
+
+  const issues = issuesResult.rows;
+
+  // reporter ids
+
+  const reporterIds = [
+    ...new Set(
+      issues.map(
+        (issue) =>
+          issue.reporter_id
+      ),
+    ),
+  ];
+
+  // users query
+
+  const usersResult = await pool.query(
+    `
+    SELECT id,name,role
+    FROM users
+    WHERE id = ANY($1)
+    `,
+    [reporterIds],
+  );
+
+  const users = usersResult.rows;
+
+  // merge reporter
+
+  const formattedIssues = issues.map(
+    (issue) => {
+
+      const reporter = users.find(
+        (user) =>
+          user.id ===
+          issue.reporter_id,
+      );
+
+      return {
+        ...issue,
+        reporter,
+      };
+    },
+  );
+
+  return formattedIssues;
 };
-
 
 
 
@@ -59,7 +165,9 @@ const getSingleIssueFromDB = async (
   id: string,
 ) => {
 
-  const result = await pool.query(
+  // issue
+
+  const issueResult = await pool.query(
     `
     SELECT * FROM issues
     WHERE id=$1
@@ -67,7 +175,34 @@ const getSingleIssueFromDB = async (
     [id],
   );
 
-  return result.rows[0];
+  if (issueResult.rows.length === 0) {
+
+    throw new Error(
+      "Issue not found!",
+    );
+
+  }
+
+  const issue = issueResult.rows[0];
+
+  // reporter
+
+  const userResult = await pool.query(
+    `
+    SELECT id,name,role
+    FROM users
+    WHERE id=$1
+    `,
+    [issue.reporter_id],
+  );
+
+  const reporter =
+    userResult.rows[0];
+
+  return {
+    ...issue,
+    reporter,
+  };
 };
 
 //update

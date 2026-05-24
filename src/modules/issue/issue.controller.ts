@@ -45,7 +45,9 @@ const getAllIssues = async (
   try {
 
     const result =
-      await issueService.getAllIssuesFromDB();
+    await issueService.getAllIssuesFromDB(
+  req.query,
+);
 
     res.status(200).json({
       success: true,
