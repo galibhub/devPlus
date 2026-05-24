@@ -85,7 +85,7 @@ const getSingleIssue = async (
 
   } catch (error: any) {
 
-    res.status(500).json({
+    res.status(404).json({
       success: false,
       message: error.message,
     });
@@ -116,7 +116,7 @@ const updateIssue = async (
 
   } catch (error: any) {
 
-    res.status(500).json({
+    res.status(400).json({
       success: false,
       message: error.message,
     });
@@ -146,7 +146,7 @@ const deleteIssue = async (
 
   } catch (error: any) {
 
-    res.status(500).json({
+    res.status(403).json({
       success: false,
       message: error.message,
     });
