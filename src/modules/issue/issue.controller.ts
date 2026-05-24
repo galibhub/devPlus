@@ -185,7 +185,7 @@ const getIssueMetrics = async (
 
   } catch (error: any) {
 
-    res.status(500).json({
+    res.status(403).json({
       success: false,
       message: error.message,
     });
